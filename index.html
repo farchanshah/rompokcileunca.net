@@ -96,6 +96,98 @@
 </head>
 <body>
 
+  <!-- Admin Access Button -->
+<div class="admin-access-btn" id="adminAccessBtn">
+  <i class="ri-settings-3-line"></i> Admin Panel
+</div>
+
+<!-- Admin Modal -->
+<div id="adminModal" class="admin-modal">
+  <div class="admin-modal-content">
+    <div class="admin-header">
+      <h2><i class="ri-dashboard-line"></i> Admin Panel Rompok Cileunca</h2>
+      <button class="close-admin" id="closeAdmin">&times;</button>
+    </div>
+    
+    <div class="admin-tabs">
+      <button class="tab-btn active" data-tab="content">Konten Website</button>
+      <button class="tab-btn" data-tab="testimonials">Komentar Pengunjung</button>
+      <button class="tab-btn" data-tab="settings">Pengaturan</button>
+    </div>
+    
+    <div class="tab-content active" id="contentTab">
+      <h3><i class="ri-edit-line"></i> Edit Konten Website</h3>
+      
+      <div class="admin-form-group">
+        <label>Home - Judul:</label>
+        <input type="text" id="editHomeTitle" placeholder="Judul Home">
+      </div>
+      
+      <div class="admin-form-group">
+        <label>Home - Deskripsi:</label>
+        <textarea id="editHomeDesc" placeholder="Deskripsi Home"></textarea>
+      </div>
+      
+      <div class="admin-form-group">
+        <label>About - Judul:</label>
+        <input type="text" id="editAboutTitle" placeholder="Judul About">
+      </div>
+      
+      <div class="admin-form-group">
+        <label>About - Deskripsi:</label>
+        <textarea id="editAboutDesc" placeholder="Deskripsi About"></textarea>
+      </div>
+      
+      <div class="admin-form-group">
+        <label>VIP Room - Harga Weekday:</label>
+        <input type="number" id="editVipWeekday" placeholder="Harga Weekday">
+      </div>
+      
+      <div class="admin-form-group">
+        <label>VIP Room - Harga Weekend:</label>
+        <input type="number" id="editVipWeekend" placeholder="Harga Weekend">
+      </div>
+      
+      <div class="admin-form-group">
+        <label>Cabin Room - Harga Weekday:</label>
+        <input type="number" id="editCabinWeekday" placeholder="Harga Weekday">
+      </div>
+      
+      <div class="admin-form-group">
+        <label>Cabin Room - Harga Weekend:</label>
+        <input type="number" id="editCabinWeekend" placeholder="Harga Weekend">
+      </div>
+      
+      <button class="admin-save-btn" id="saveContent">
+        <i class="ri-save-line"></i> Simpan Semua Perubahan
+      </button>
+    </div>
+    
+    <div class="tab-content" id="testimonialsTab">
+      <h3><i class="ri-chat-3-line"></i> Kelola Komentar Pengunjung</h3>
+      <div id="commentsList"></div>
+    </div>
+    
+    <div class="tab-content" id="settingsTab">
+      <h3><i class="ri-settings-line"></i> Pengaturan Sistem</h3>
+      
+      <div class="admin-form-group">
+        <label>Password Admin:</label>
+        <input type="password" id="adminPassword" placeholder="Ganti password admin">
+      </div>
+      
+      <div class="admin-form-group">
+        <label>Auto-save Interval (detik):</label>
+        <input type="number" id="autoSaveInterval" value="30" min="10">
+      </div>
+      
+      <button class="admin-save-btn" id="saveSettings">
+        <i class="ri-settings-5-line"></i> Simpan Pengaturan
+      </button>
+    </div>
+  </div>
+</div>
+  
 <!-- =============== HEADER =============== --> 
 <header id="header" class="header" style="position:relative; z-index:1000;">
   <div class="header__wrapper">
@@ -1486,64 +1578,46 @@
     </p>
   </div>
 
-  <!-- ========== VIDEO WRAPPER: Main (kiri) + 3 Thumbs (kanan) ========== -->
-  <div class="video-section">
-    <!-- Main Video -->
-    <div class="main-video">
-      <div class="main-video__frame" id="mainVideoFrame">
-        <video id="mainVideo" playsinline preload="metadata">
-          <source src="assets/video/VID-20250815-WA0018.mp4" type="video/mp4">
-        </video>
-
-        <!-- Overlay Play -->
-        <button class="main-play-overlay" id="mainPlay" aria-label="Play">
-          <i class="ri-play-circle-fill"></i>
-        </button>
-
-        <!-- Spinner -->
-        <div class="spinner" id="videoSpinner"></div>
-      </div>
-
-      <!-- Custom Controls -->
-      <div class="controls">
-        <button type="button" class="btn-ctl" id="btnPlay">Play</button>
-        <button type="button" class="btn-ctl" id="btnPause">Pause</button>
-        <button type="button" class="btn-ctl" id="btnStop">Stop</button>
-        <label for="volumeControl" class="vol-label">Volume</label>
-        <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
-        <button type="button" class="btn-ctl" id="btnFullscreen">Fullscreen</button>
+  <!-- Video Exchange System -->
+<div class="video-exchange-system">
+  <!-- Main Video -->
+  <div class="main-video-exchange">
+    <div class="main-video-exchange__frame">
+      <video id="mainExchangeVideo" playsinline preload="metadata" controls>
+        <source src="assets/video/VID-20250815-WA0018.mp4" type="video/mp4">
+      </video>
+      <div class="video-info">
+        <h4 id="currentVideoTitle">Video Utama</h4>
+        <p id="currentVideoDesc">Tonton pengalaman langsung di Rompok Cileunca</p>
       </div>
     </div>
-
-    <!-- Thumbnails (kanan) -->
-    <div class="thumbnails" id="thumbs">
-      <!-- Thumb 1 (aktif default) -->
-<div class="thumb active" data-src="assets/video/VID-20250819-WA0007.mp4">
-  <div class="thumb__frame">
-    <video class="thumb__video" muted playsinline preload="none">
-      <source src="assets/video/VID-20250819-WA0007.mp4" type="video/mp4">
-    </video>
-    <div class="thumb__overlay"><i class="ri-play-circle-fill"></i></div>
   </div>
-</div>
 
-<!-- Thumb 2 -->
-<div class="thumb" data-src="assets/video/VID-20250819-WA0001(1).mp4">
-  <div class="thumb__frame">
-    <video class="thumb__video" muted playsinline preload="none">
-      <source src="assets/video/VID-20250819-WA0001(1).mp4" type="video/mp4">
-    </video>
-    <div class="thumb__overlay"><i class="ri-play-circle-fill"></i></div>
-  </div>
-</div>
-
-<!-- Thumb 3 -->
-<div class="thumb" data-src="assets/video/VID-20250819-WA0005(1).mp4">
-  <div class="thumb__frame">
-    <video class="thumb__video" muted playsinline preload="none">
-      <source src="assets/video/VID-20250819-WA0005(1).mp4" type="video/mp4">
-    </video>
-    <div class="thumb__overlay"><i class="ri-play-circle-fill"></i></div>
+  <!-- Thumbnails for Exchange -->
+  <div class="exchange-thumbnails" id="videoThumbnails">
+    <div class="exchange-thumb" data-index="0" data-src="assets/video/VID-20250819-WA0007.mp4">
+      <video muted playsinline preload="metadata">
+        <source src="assets/video/VID-20250819-WA0007.mp4" type="video/mp4">
+      </video>
+      <div class="thumb-overlay"><i class="ri-play-circle-fill"></i></div>
+      <div class="thumb-label">Tour Villa</div>
+    </div>
+    
+    <div class="exchange-thumb" data-index="1" data-src="assets/video/VID-20250819-WA0001(1).mp4">
+      <video muted playsinline preload="metadata">
+        <source src="assets/video/VID-20250819-WA0001(1).mp4" type="video/mp4">
+      </video>
+      <div class="thumb-overlay"><i class="ri-play-circle-fill"></i></div>
+      <div class="thumb-label">Rafting</div>
+    </div>
+    
+    <div class="exchange-thumb" data-index="2" data-src="assets/video/VID-20250819-WA0005(1).mp4">
+      <video muted playsinline preload="metadata">
+        <source src="assets/video/VID-20250819-WA0005(1).mp4" type="video/mp4">
+      </video>
+      <div class="thumb-overlay"><i class="ri-play-circle-fill"></i></div>
+      <div class="thumb-label">Flying Fox</div>
+    </div>
   </div>
 </div>
 
@@ -1958,6 +2032,24 @@
       </div>
     </div>
 
+    <!-- Form Komentar Pengunjung -->
+<div class="testimonial-form">
+  <h3><i class="ri-chat-quote-line"></i> Bagikan Pengalaman Anda</h3>
+  <form id="visitorCommentForm">
+    <input type="text" id="commentName" placeholder="Nama Anda" required>
+    <input type="text" id="commentTitle" placeholder="Judul Komentar" required>
+    <textarea id="commentText" placeholder="Ceritakan pengalaman Anda..." required></textarea>
+    <button type="submit" class="btn" style="width:100%;">
+      <i class="ri-send-plane-fill"></i> Kirim Komentar
+    </button>
+  </form>
+</div>
+
+<!-- Carousel Komentar Dinamis -->
+<div class="comment-carousel" id="commentCarousel">
+  <!-- Komentar akan dimuat dinamis di sini -->
+</div>
+
     <!-- Right Side -->
     <div class="testimonial__right">
       <div class="testimonial__images">
@@ -2213,3 +2305,4 @@
    </body>
 
 </html>
+
