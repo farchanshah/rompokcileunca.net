@@ -159,41 +159,85 @@ class AdminCMS {
     });
   }
   
-  exchangeVideo(thumbElement, mainVideo) {
-    const newSrc = thumbElement.dataset.src;
+  // ===========================================
+// VIDEO EXCHANGE SYSTEM - YANG BENAR
+// ===========================================
+class VideoExchangeSystem {
+  constructor() {
+    this.videos = [
+      {
+        id: 'main',
+        src: 'assets/video/VID-20250815-WA0018.mp4',
+        title: 'Tour Utama Villa'
+      },
+      {
+        id: 'thumb1',
+        src: 'assets/video/VID-20250819-WA0007.mp4',
+        title: 'Aktivitas 1'
+      },
+      {
+        id: 'thumb2',
+        src: 'assets/video/VID-20250819-WA0001(1).mp4',
+        title: 'Aktivitas 2'
+      },
+      {
+        id: 'thumb3',
+        src: 'assets/video/VID-20250819-WA0005(1).mp4',
+        title: 'Aktivitas 3'
+      }
+    ];
+    this.currentMainIndex = 0;
+    this.currentThumbs = [1, 2, 3];
+    this.init();
+  }
+  
+  init() {
+    this.setupVideoExchange();
+  }
+  
+  setupVideoExchange() {
+    const thumbs = document.querySelectorAll('.exchange-thumb');
+    
+    thumbs.forEach((thumb, index) => {
+      thumb.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.exchangeVideo(index);
+      });
+    });
+  }
+  
+  exchangeVideo(thumbIndex) {
+    const mainVideo = document.getElementById('mainExchangeVideo');
     const mainSource = mainVideo.querySelector('source');
     
-    if (!newSrc || !mainSource) return;
-    
-    // Get thumb video source
-    const thumbVideo = thumbElement.querySelector('.thumb__video');
+    const clickedThumb = document.querySelectorAll('.exchange-thumb')[thumbIndex];
+    const thumbVideo = clickedThumb.querySelector('video');
     const thumbSource = thumbVideo.querySelector('source');
     
-    if (!thumbSource) return;
+    if (!mainSource || !thumbSource) return;
     
-    // Store current sources
-    const currentMainSrc = mainSource.src;
-    const currentThumbSrc = thumbSource.src;
+    // Simpan sumber video sementara
+    const mainSrc = mainSource.src;
+    const thumbSrc = thumbSource.src;
     
-    // Swap sources
-    mainSource.src = currentThumbSrc;
-    thumbSource.src = currentMainSrc;
+    // Tukar sumber video
+    mainSource.src = thumbSrc;
+    thumbSource.src = mainSrc;
     
-    // Load videos
+    // Load ulang video
     mainVideo.load();
     thumbVideo.load();
     
-    // Update active state
-    document.querySelectorAll('.exchange-thumb').forEach(t => {
-      t.classList.remove('active');
+    // Update status aktif
+    document.querySelectorAll('.exchange-thumb').forEach(thumb => {
+      thumb.classList.remove('active');
     });
-    thumbElement.classList.add('active');
+    clickedThumb.classList.add('active');
     
-    // Play main video if it was playing
-    if (!mainVideo.paused) {
-      mainVideo.play().catch(() => {});
-    }
+    console.log('Video ditukar: Main ->', thumbSrc, 'Thumb ->', mainSrc);
   }
+}
   
   showAdminLogin() {
     const password = prompt('Masukkan Password Admin:');
