@@ -2739,9 +2739,250 @@
   <!-- Script files -->
   <script src="assets/js/script.js"></script>
   <script src="assets/js/admin-system.js"></script>
+
+<script>
+// ========== SISTEM KOMENTAR PENGUNJUNG ==========
+class VisitorCommentSystem {
+  constructor() {
+    this.comments = [];
+    this.currentCommentIndex = 0;
+    this.autoRotateInterval = null;
+    this.init();
+  }
+  
+  init() {
+    this.loadComments();
+    this.setupModal();
+    this.startCommentRotation();
+  }
+  
+  loadComments() {
+    // Load komentar dari localStorage atau gunakan default
+    const saved = localStorage.getItem('rompokCileuncaComments');
+    if (saved) {
+      this.comments = JSON.parse(saved);
+    } else {
+      // Komentar default
+      this.comments = [
+        {
+          id: 1,
+          name: "Budi Santoso",
+          title: "Liburan Keluarga Tak Terlupakan",
+          text: "Rompok Cileunca sangat cocok untuk liburan keluarga! Villa-nya nyaman, udara sejuk, dan fasilitas lengkap. Anak-anak sangat senang bermain di alam terbuka.",
+          date: "15 Jan 2025"
+        },
+        {
+          id: 2,
+          name: "Sari Wijaya",
+          title: "Perfect Getaway dari Kota",
+          text: "Suasana yang tenang dan pemandangan indah. Pelayanan staff sangat ramah. Aktivitas rafting dan ATV sangat seru! Pasti akan kembali lagi.",
+          date: "10 Jan 2025"
+        },
+        {
+          id: 3,
+          name: "Agus Setiawan",
+          title: "Team Building yang Sukses",
+          text: "Kami mengadakan company outing di sini. Fasilitas meeting memadai, makanan enak, dan wahana adventure membuat acara lebih hidup. Recommended!",
+          date: "5 Jan 2025"
+        }
+      ];
+    }
+    
+    // Update carousel
+    this.updateCommentCarousel();
+  }
+  
+  setupModal() {
+    const addCommentIcon = document.getElementById('addCommentIcon');
+    const commentModal = document.getElementById('commentModal');
+    const closeModal = document.getElementById('closeCommentModal');
+    const commentForm = document.getElementById('visitorCommentForm');
+    
+    // Buka modal saat ikon diklik
+    if (addCommentIcon) {
+      addCommentIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        commentModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      });
+    }
+    
+    // Tutup modal
+    if (closeModal) {
+      closeModal.addEventListener('click', () => {
+        commentModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      });
+    }
+    
+    // Tutup modal jika klik di luar
+    if (commentModal) {
+      commentModal.addEventListener('click', (e) => {
+        if (e.target === commentModal) {
+          commentModal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      });
+    }
+    
+    // Form submission
+    if (commentForm) {
+      commentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.addNewComment();
+      });
+    }
+  }
+  
+  addNewComment() {
+    const name = document.getElementById('commentName').value.trim();
+    const title = document.getElementById('commentTitle').value.trim();
+    const text = document.getElementById('commentText').value.trim();
+    
+    if (!name || !title || !text) {
+      alert('Harap isi semua field yang diperlukan!');
+      return;
+    }
+    
+    // Buat komentar baru
+    const newComment = {
+      id: Date.now(),
+      name: name,
+      title: title,
+      text: text,
+      date: new Date().toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    };
+    
+    // Tambahkan ke array
+    this.comments.unshift(newComment); // Tambah di awal
+    
+    // Simpan ke localStorage
+    this.saveComments();
+    
+    // Update carousel
+    this.updateCommentCarousel();
+    
+    // Reset form dan tutup modal
+    document.getElementById('visitorCommentForm').reset();
+    document.getElementById('commentModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Tampilkan konfirmasi
+    alert('Terima kasih! Komentar Anda telah berhasil dikirim dan akan ditampilkan di carousel.');
+  }
+  
+  saveComments() {
+    localStorage.setItem('rompokCileuncaComments', JSON.stringify(this.comments));
+  }
+  
+  updateCommentCarousel() {
+    const carousel = document.getElementById('commentCarousel');
+    if (!carousel) return;
+    
+    // Kosongkan carousel
+    carousel.innerHTML = '';
+    
+    // Tambahkan komentar ke carousel (maksimal 10)
+    const commentsToShow = this.comments.slice(0, 10);
+    
+    commentsToShow.forEach((comment, index) => {
+      const slide = document.createElement('div');
+      slide.className = `comment-slide ${index === 0 ? 'active' : ''}`;
+      slide.innerHTML = `
+        <div class="testimonial__wrapper" style="height:250px;">
+          <div class="orange__card"></div>
+          <div class="testimonial__card" style="height:100%;">
+            <div class="testimonial__quote-mark"><i class="ri-double-quotes-l"></i></div> 
+            <h2 class="testimonial__card-title">${comment.name}</h2>
+            <h4 style="color:var(--orange-color); margin:5px 0;">${comment.title}</h4>
+            <p class="testimonial__card-desc">${comment.text}</p>
+            <small style="display:block; margin-top:10px; color:#888;">${comment.date}</small>
+            <div class="testimonial__quote-mark testimonial__quote-mark-right"><i class="ri-double-quotes-r"></i></div>
+          </div>
+          <div class="testimonial__user">
+            <img src="assets/images/user.jpg" alt="${comment.name}" />  
+          </div>
+        </div>
+      `;
+      carousel.appendChild(slide);
+    });
+    
+    // Mulai rotasi jika ada lebih dari 1 komentar
+    if (this.comments.length > 1) {
+      this.startCommentRotation();
+    }
+  }
+  
+  startCommentRotation() {
+    // Hentikan interval sebelumnya
+    if (this.autoRotateInterval) {
+      clearInterval(this.autoRotateInterval);
+    }
+    
+    // Mulai rotasi setiap 5 detik
+    this.autoRotateInterval = setInterval(() => {
+      this.nextComment();
+    }, 5000);
+  }
+  
+  nextComment() {
+    const slides = document.querySelectorAll('.comment-slide');
+    if (slides.length <= 1) return;
+    
+    // Cari slide aktif
+    let currentIndex = -1;
+    slides.forEach((slide, index) => {
+      if (slide.classList.contains('active')) {
+        currentIndex = index;
+      }
+    });
+    
+    // Hapus kelas aktif dari slide saat ini
+    slides[currentIndex]?.classList.remove('active');
+    
+    // Hitung slide berikutnya
+    const nextIndex = (currentIndex + 1) % slides.length;
+    
+    // Tambahkan kelas aktif ke slide berikutnya
+    slides[nextIndex]?.classList.add('active');
+    
+    this.currentCommentIndex = nextIndex;
+  }
+}
+
+// Inisialisasi sistem komentar saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  window.visitorCommentSystem = new VisitorCommentSystem();
+  
+  // Tambahkan keyboard shortcut untuk modal
+  document.addEventListener('keydown', (e) => {
+    // Escape untuk tutup modal
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('commentModal');
+      if (modal && modal.style.display === 'flex') {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+    
+    // Ctrl/Cmd + K untuk buka modal
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      const addIcon = document.getElementById('addCommentIcon');
+      if (addIcon) addIcon.click();
+    }
+  });
+});
+</script>
+
 </body>
 
 </html>
+
 
 
 
