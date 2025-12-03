@@ -2138,8 +2138,7 @@
   });
   mainVideoFrame.setAttribute('tabindex','0');
 
-  
-  // ====== CAROUSEL LOGIC (4 per view / 2 / 1) ======
+  // ====== CAROUSEL LOGIC (tetap sama) ======
   const track = document.getElementById('carTrack');
   const prevBtn = document.getElementById('carPrev');
   const nextBtn = document.getElementById('carNext');
@@ -2153,26 +2152,6 @@
   let isDragging = false, startX = 0, scrollStart = 0;
   let items = Array.from(track.children);
 
-  // Clone edges for infinite loop
-  function setupClones(){
-    // cleanup first
-    track.querySelectorAll('.clone').forEach(c=>c.remove());
-    items = Array.from(track.children).filter(el => !el.classList.contains('clone'));
-
-    const head = items.slice(0, perView).map(cloneNode);
-    const tail = items.slice(-perView).map(cloneNode);
-
-    tail.forEach(n => track.insertBefore(n, track.firstChild));
-    head.forEach(n => track.appendChild(n));
-  }
-  function cloneNode(node){
-    const c = node.cloneNode(true);
-    c.classList.add('clone');
-    return c;
-  }
-
-  // Positioning
-  let index = 0; // logical page index
   function getPerView(){
     return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rc-perView')) || 4;
   }
@@ -2602,6 +2581,7 @@
 </body>
 
 </html>
+
 
 
 
