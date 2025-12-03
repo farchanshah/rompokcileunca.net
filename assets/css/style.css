@@ -2624,3 +2624,51 @@ body.rooms-page .home {
     padding: 20px;
   }
 }
+
+/* Style untuk icon tambah komentar */
+.add-comment-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: var(--orange-color);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  margin: 20px auto;
+  font-size: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 90, 95, 0.3);
+  z-index: 10;
+}
+
+.add-comment-icon:hover {
+  background: var(--dark-orange-color);
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 6px 20px rgba(255, 90, 95, 0.4);
+}
+
+.add-comment-icon .tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark-blue-color);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+  margin-bottom: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-weight: 500;
+}
+
+.add-comment-icon:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
