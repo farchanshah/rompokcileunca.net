@@ -1579,49 +1579,72 @@
     </p>
   </div>
 
-  <!-- Video Exchange System -->
-<div class="video-exchange-system">
+<!-- ========== VIDEO GALLERY ASLI (DIPERTAHANKAN) ========== -->
+<div class="video-section">
   <!-- Main Video -->
-  <div class="main-video-exchange">
-    <div class="main-video-exchange__frame">
-      <video id="mainExchangeVideo" playsinline preload="metadata" controls>
+  <div class="main-video">
+    <div class="main-video__frame" id="mainVideoFrame">
+      <video id="mainVideo" playsinline preload="metadata">
         <source src="assets/video/VID-20250815-WA0018.mp4" type="video/mp4">
       </video>
-      <div class="video-info">
-        <h4 id="currentVideoTitle">Video Utama</h4>
-        <p id="currentVideoDesc">Tonton pengalaman langsung di Rompok Cileunca</p>
+
+      <!-- Overlay Play -->
+      <button class="main-play-overlay" id="mainPlay" aria-label="Play">
+        <i class="ri-play-circle-fill"></i>
+      </button>
+
+      <!-- Spinner -->
+      <div class="spinner" id="videoSpinner"></div>
+    </div>
+
+    <!-- Custom Controls -->
+    <div class="controls">
+      <button type="button" class="btn-ctl" id="btnPlay">Play</button>
+      <button type="button" class="btn-ctl" id="btnPause">Pause</button>
+      <button type="button" class="btn-ctl" id="btnStop">Stop</button>
+      <label for="volumeControl" class="vol-label">Volume</label>
+      <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
+      <button type="button" class="btn-ctl" id="btnFullscreen">Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- Thumbnails (kanan) - UNTUK VIDEO EXCHANGE -->
+  <div class="thumbnails" id="thumbs">
+    <!-- Thumb 1 -->
+    <div class="thumb exchange-thumb" data-src="assets/video/VID-20250819-WA0007.mp4">
+      <div class="thumb__frame">
+        <video class="thumb__video" muted playsinline preload="none">
+          <source src="assets/video/VID-20250819-WA0007.mp4" type="video/mp4">
+        </video>
+        <div class="thumb__overlay"><i class="ri-play-circle-fill"></i></div>
+        <div class="exchange-indicator"><i class="ri-exchange-line"></i> Tukar</div>
+      </div>
+    </div>
+
+    <!-- Thumb 2 -->
+    <div class="thumb exchange-thumb" data-src="assets/video/VID-20250819-WA0001(1).mp4">
+      <div class="thumb__frame">
+        <video class="thumb__video" muted playsinline preload="none">
+          <source src="assets/video/VID-20250819-WA0001(1).mp4" type="video/mp4">
+        </video>
+        <div class="thumb__overlay"><i class="ri-play-circle-fill"></i></div>
+        <div class="exchange-indicator"><i class="ri-exchange-line"></i> Tukar</div>
+      </div>
+    </div>
+
+    <!-- Thumb 3 -->
+    <div class="thumb exchange-thumb" data-src="assets/video/VID-20250819-WA0005(1).mp4">
+      <div class="thumb__frame">
+        <video class="thumb__video" muted playsinline preload="none">
+          <source src="assets/video/VID-20250819-WA0005(1).mp4" type="video/mp4">
+        </video>
+        <div class="thumb__overlay"><i class="ri-play-circle-fill"></i></div>
+        <div class="exchange-indicator"><i class="ri-exchange-line"></i> Tukar</div>
       </div>
     </div>
   </div>
-
-  <!-- Thumbnails for Exchange -->
-  <div class="exchange-thumbnails" id="videoThumbnails">
-    <div class="exchange-thumb" data-index="0" data-src="assets/video/VID-20250819-WA0007.mp4">
-      <video muted playsinline preload="metadata">
-        <source src="assets/video/VID-20250819-WA0007.mp4" type="video/mp4">
-      </video>
-      <div class="thumb-overlay"><i class="ri-play-circle-fill"></i></div>
-      <div class="thumb-label">Tour Villa</div>
-    </div>
-    
-    <div class="exchange-thumb" data-index="1" data-src="assets/video/VID-20250819-WA0001(1).mp4">
-      <video muted playsinline preload="metadata">
-        <source src="assets/video/VID-20250819-WA0001(1).mp4" type="video/mp4">
-      </video>
-      <div class="thumb-overlay"><i class="ri-play-circle-fill"></i></div>
-      <div class="thumb-label">Rafting</div>
-    </div>
-    
-    <div class="exchange-thumb" data-index="2" data-src="assets/video/VID-20250819-WA0005(1).mp4">
-      <video muted playsinline preload="metadata">
-        <source src="assets/video/VID-20250819-WA0005(1).mp4" type="video/mp4">
-      </video>
-      <div class="thumb-overlay"><i class="ri-play-circle-fill"></i></div>
-      <div class="thumb-label">Flying Fox</div>
-    </div>
-  </div>
 </div>
-
+  
   </div>
 
   <!-- ==================== SLIDESHOW: 10 foto (4 per view) ==================== -->
@@ -2308,6 +2331,7 @@
    </body>
 
 </html>
+
 
 
 
