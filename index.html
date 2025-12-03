@@ -2268,10 +2268,40 @@
       </div>
     </div>
 
-    <!-- ========== ICON TAMBAH KOMENTAR ========== -->
+    <!-- ========== HANYA ICON TAMBAH KOMENTAR ========== -->
 <div class="add-comment-icon" id="addCommentIcon">
   <i class="ri-chat-3-line"></i>
-  <span class="tooltip-text">Tambahkan Komentar</span>
+  <span class="tooltip-text">Bagikan Pengalaman Anda</span>
+</div>
+
+<!-- ========== COMMENT MODAL (Tersembunyi) ========== -->
+<div class="comment-modal" id="commentModal">
+  <div class="comment-modal-content">
+    <div class="comment-modal-header">
+      <h3><i class="ri-chat-quote-line"></i> Bagikan Pengalaman Anda</h3>
+      <button class="close-comment-modal" id="closeCommentModal">&times;</button>
+    </div>
+    <form id="visitorCommentForm">
+      <div class="form-group">
+        <input type="text" id="commentName" placeholder="Nama Anda *" required>
+      </div>
+      <div class="form-group">
+        <input type="text" id="commentTitle" placeholder="Judul Komentar *" required>
+      </div>
+      <div class="form-group">
+        <textarea id="commentText" placeholder="Ceritakan pengalaman Anda di Rompok Cileunca... *" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="commentAgree" required>
+          Saya setuju komentar ditampilkan di website
+        </label>
+      </div>
+      <button type="submit" class="comment-submit-btn">
+        <i class="ri-send-plane-fill"></i> Kirim Komentar
+      </button>
+    </form>
+  </div>
 </div>
 
 <!-- ========== COMMENT CAROUSEL ========== -->
@@ -2279,24 +2309,6 @@
   <!-- Komentar akan dimuat dinamis di sini -->
 </div>
     
-    <!-- Form Komentar Pengunjung -->
-<div class="testimonial-form">
-  <h3><i class="ri-chat-quote-line"></i> Bagikan Pengalaman Anda</h3>
-  <form id="visitorCommentForm">
-    <input type="text" id="commentName" placeholder="Nama Anda" required>
-    <input type="text" id="commentTitle" placeholder="Judul Komentar" required>
-    <textarea id="commentText" placeholder="Ceritakan pengalaman Anda..." required></textarea>
-    <button type="submit" class="btn" style="width:100%;">
-      <i class="ri-send-plane-fill"></i> Kirim Komentar
-    </button>
-  </form>
-</div>
-
-<!-- Carousel Komentar Dinamis -->
-<div class="comment-carousel" id="commentCarousel">
-  <!-- Komentar akan dimuat dinamis di sini -->
-</div>
-
     <!-- Right Side -->
     <div class="testimonial__right">
       <div class="testimonial__images">
@@ -2554,6 +2566,7 @@
 </body>
 
 </html>
+
 
 
 
