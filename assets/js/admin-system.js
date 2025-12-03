@@ -433,10 +433,6 @@ class VideoExchangeSystem {
     
     if (approvedComments.length === 0) {
       carousel.innerHTML = `
-        <div class="no-comments" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
-          <i class="ri-chat-3-line" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i>
-          <p style="color: #888;">Belum ada komentar. Jadilah yang pertama!</p>
-        </div>
       `;
       return;
     }
