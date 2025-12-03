@@ -1,5 +1,5 @@
 // ===========================================
-// SISTEM ADMIN CMS - TANPA MENGHAPUS KONTEN ASLI
+// SISTEM ADMIN CMS YANG DIPERBAIKI
 // ===========================================
 class AdminCMS {
   constructor() {
@@ -23,7 +23,6 @@ class AdminCMS {
     if (saved) {
       this.data = JSON.parse(saved);
     } else {
-      // Data default
       this.data = {
         content: {
           homeTitle: 'Rompok Cileunca',
@@ -58,15 +57,22 @@ class AdminCMS {
   }
   
   setupEventListeners() {
-    // Admin Access Button
-    document.getElementById('adminAccessBtn').addEventListener('click', () => {
-      this.showAdminLogin();
-    });
+    // Admin Gear Icon
+    const adminIcon = document.getElementById('adminGearIcon');
+    if (adminIcon) {
+      adminIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.showAdminLogin();
+      });
+    }
     
     // Close Admin Panel
-    document.getElementById('closeAdmin').addEventListener('click', () => {
-      document.getElementById('adminModal').style.display = 'none';
-    });
+    const closeAdmin = document.getElementById('closeAdmin');
+    if (closeAdmin) {
+      closeAdmin.addEventListener('click', () => {
+        document.getElementById('adminModal').style.display = 'none';
+      });
+    }
     
     // Tab Switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -77,17 +83,59 @@ class AdminCMS {
     });
     
     // Save Content
-    document.getElementById('saveContent').addEventListener('click', () => {
-      this.saveContentChanges();
-    });
+    const saveContentBtn = document.getElementById('saveContent');
+    if (saveContentBtn) {
+      saveContentBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.saveContentChanges();
+      });
+    }
     
     // Save Settings
-    document.getElementById('saveSettings').addEventListener('click', () => {
-      this.saveSettings();
-    });
+    const saveSettingsBtn = document.getElementById('saveSettings');
+    if (saveSettingsBtn) {
+      saveSettingsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.saveSettings();
+      });
+    }
     
-    // Visitor Comment Form
+    // Comment Modal
+    this.setupCommentModal();
+    
+    // Video Exchange
+    this.setupVideoExchange();
+  }
+  
+  setupCommentModal() {
+    const addCommentIcon = document.getElementById('addCommentIcon');
+    const commentModal = document.getElementById('commentModal');
+    const closeCommentModal = document.getElementById('closeCommentModal');
     const commentForm = document.getElementById('visitorCommentForm');
+    
+    if (addCommentIcon && commentModal) {
+      addCommentIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        commentModal.style.display = 'flex';
+      });
+    }
+    
+    if (closeCommentModal && commentModal) {
+      closeCommentModal.addEventListener('click', () => {
+        commentModal.style.display = 'none';
+      });
+    }
+    
+    // Close modal when clicking outside
+    if (commentModal) {
+      commentModal.addEventListener('click', (e) => {
+        if (e.target === commentModal) {
+          commentModal.style.display = 'none';
+        }
+      });
+    }
+    
+    // Comment Form Submission
     if (commentForm) {
       commentForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -96,16 +144,69 @@ class AdminCMS {
     }
   }
   
+  setupVideoExchange() {
+    const exchangeThumbs = document.querySelectorAll('.exchange-thumb');
+    const mainVideo = document.getElementById('mainVideo');
+    
+    if (!mainVideo || exchangeThumbs.length === 0) return;
+    
+    exchangeThumbs.forEach(thumb => {
+      thumb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.exchangeVideo(thumb, mainVideo);
+      });
+    });
+  }
+  
+  exchangeVideo(thumbElement, mainVideo) {
+    const newSrc = thumbElement.dataset.src;
+    const mainSource = mainVideo.querySelector('source');
+    
+    if (!newSrc || !mainSource) return;
+    
+    // Get thumb video source
+    const thumbVideo = thumbElement.querySelector('.thumb__video');
+    const thumbSource = thumbVideo.querySelector('source');
+    
+    if (!thumbSource) return;
+    
+    // Store current sources
+    const currentMainSrc = mainSource.src;
+    const currentThumbSrc = thumbSource.src;
+    
+    // Swap sources
+    mainSource.src = currentThumbSrc;
+    thumbSource.src = currentMainSrc;
+    
+    // Load videos
+    mainVideo.load();
+    thumbVideo.load();
+    
+    // Update active state
+    document.querySelectorAll('.exchange-thumb').forEach(t => {
+      t.classList.remove('active');
+    });
+    thumbElement.classList.add('active');
+    
+    // Play main video if it was playing
+    if (!mainVideo.paused) {
+      mainVideo.play().catch(() => {});
+    }
+  }
+  
   showAdminLogin() {
     const password = prompt('Masukkan Password Admin:');
     if (password === this.data.settings.adminPassword) {
       this.showAdminPanel();
-    } else {
+    } else if (password !== null) {
       alert('Password salah!');
     }
   }
   
   showAdminPanel() {
+    const adminModal = document.getElementById('adminModal');
+    if (!adminModal) return;
+    
     // Populate form fields
     document.getElementById('editHomeTitle').value = this.data.content.homeTitle;
     document.getElementById('editHomeDesc').value = this.data.content.homeDesc;
@@ -120,7 +221,14 @@ class AdminCMS {
     this.loadCommentsForAdmin();
     
     // Show modal
-    document.getElementById('adminModal').style.display = 'flex';
+    adminModal.style.display = 'flex';
+    
+    // Close modal when clicking outside
+    adminModal.addEventListener('click', (e) => {
+      if (e.target === adminModal) {
+        adminModal.style.display = 'none';
+      }
+    });
   }
   
   switchTab(tabName) {
@@ -263,10 +371,11 @@ class AdminCMS {
     this.saveData();
     this.loadCommentsCarousel();
     
-    // Clear form
+    // Clear form and close modal
     document.getElementById('commentName').value = '';
     document.getElementById('commentTitle').value = '';
     document.getElementById('commentText').value = '';
+    document.getElementById('commentModal').style.display = 'none';
     
     alert('Terima kasih atas komentar Anda!');
   }
@@ -277,7 +386,15 @@ class AdminCMS {
     
     const approvedComments = this.data.testimonials.filter(c => c.approved);
     
-    if (approvedComments.length === 0) return;
+    if (approvedComments.length === 0) {
+      carousel.innerHTML = `
+        <div class="no-comments">
+          <i class="ri-chat-3-line" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i>
+          <p style="color: #888;">Belum ada komentar. Jadilah yang pertama!</p>
+        </div>
+      `;
+      return;
+    }
     
     carousel.innerHTML = '';
     approvedComments.forEach((comment, index) => {
@@ -312,15 +429,30 @@ class AdminCMS {
     
     let currentSlide = 0;
     
-    setInterval(() => {
+    const carouselInterval = setInterval(() => {
       slides[currentSlide].classList.remove('active');
       currentSlide = (currentSlide + 1) % slides.length;
       slides[currentSlide].classList.add('active');
     }, 5000); // Ganti setiap 5 detik
+    
+    // Pause carousel on hover
+    const carousel = document.getElementById('commentCarousel');
+    if (carousel) {
+      carousel.addEventListener('mouseenter', () => {
+        clearInterval(carouselInterval);
+      });
+      
+      carousel.addEventListener('mouseleave', () => {
+        clearInterval(carouselInterval);
+        this.startCommentCarousel();
+      });
+    }
   }
   
   loadCommentsForAdmin() {
     const container = document.getElementById('commentsList');
+    if (!container) return;
+    
     container.innerHTML = '';
     
     this.data.testimonials.forEach(comment => {
@@ -383,138 +515,31 @@ class AdminCMS {
 }
 
 // ===========================================
-// VIDEO EXCHANGE SYSTEM
-// ===========================================
-class VideoExchangeSystem {
-  constructor() {
-    this.currentMainVideo = 'assets/video/VID-20250815-WA0018.mp4';
-    this.videoData = [
-      {
-        src: 'assets/video/VID-20250815-WA0018.mp4',
-        title: 'Tour Utama',
-        description: 'Lihat keseluruhan villa dan fasilitas'
-      },
-      {
-        src: 'assets/video/VID-20250819-WA0007.mp4',
-        title: 'Aktivitas Rafting',
-        description: 'Petualangan seru di sungai'
-      },
-      {
-        src: 'assets/video/VID-20250819-WA0001(1).mp4',
-        title: 'Flying Fox',
-        description: 'Terbang di atas pepohonan'
-      },
-      {
-        src: 'assets/video/VID-20250819-WA0005(1).mp4',
-        title: 'Suasana Alam',
-        description: 'Keindahan alam sekitar'
-      }
-    ];
-    this.init();
-  }
-  
-  init() {
-    this.setupEventListeners();
-    this.setupThumbnails();
-    this.updateMainVideo();
-  }
-  
-  setupEventListeners() {
-    const thumbs = document.querySelectorAll('.exchange-thumb');
-    thumbs.forEach(thumb => {
-      thumb.addEventListener('click', (e) => {
-        this.exchangeVideo(thumb);
-      });
-    });
-  }
-  
-  setupThumbnails() {
-    // Set first thumbnail as active
-    const firstThumb = document.querySelector('.exchange-thumb');
-    if (firstThumb) firstThumb.classList.add('active');
-  }
-  
-  exchangeVideo(thumbElement) {
-    const newSrc = thumbElement.dataset.src;
-    
-    if (newSrc === this.currentMainVideo) return;
-    
-    // Get main video and thumb video elements
-    const mainVideo = document.getElementById('mainExchangeVideo');
-    const mainSource = mainVideo.querySelector('source');
-    
-    const thumbVideo = thumbElement.querySelector('video');
-    const thumbSource = thumbVideo.querySelector('source');
-    
-    // Swap video sources
-    const tempSrc = mainSource.src;
-    mainSource.src = thumbSource.src;
-    thumbSource.src = tempSrc;
-    
-    // Load the new videos
-    mainVideo.load();
-    thumbVideo.load();
-    
-    // Update current main video
-    this.currentMainVideo = newSrc;
-    
-    // Update active state
-    document.querySelectorAll('.exchange-thumb').forEach(thumb => {
-      thumb.classList.remove('active');
-    });
-    thumbElement.classList.add('active');
-    
-    // Update video info
-    this.updateVideoInfo();
-  }
-  
-  updateVideoInfo() {
-    const videoInfo = this.videoData.find(v => v.src === this.currentMainVideo);
-    const titleEl = document.getElementById('currentVideoTitle');
-    const descEl = document.getElementById('currentVideoDesc');
-    
-    if (videoInfo && titleEl && descEl) {
-      titleEl.textContent = videoInfo.title;
-      descEl.textContent = videoInfo.description;
-    }
-  }
-  
-  updateMainVideo() {
-    const mainVideo = document.getElementById('mainExchangeVideo');
-    if (mainVideo) {
-      mainVideo.load();
-      this.updateVideoInfo();
-    }
-  }
-}
-
-// ===========================================
-// INITIALIZE ALL SYSTEMS
+// INITIALIZE SYSTEM
 // ===========================================
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize Admin CMS
   window.adminSystem = new AdminCMS();
   
-  // Initialize Video Exchange System
-  window.videoSystem = new VideoExchangeSystem();
+  console.log('Rompok Cileunca Admin System Initialized');
   
-  console.log('All systems initialized successfully!');
-  
-  // Overlay untuk modal
-  const adminModal = document.getElementById('adminModal');
-  if (adminModal) {
-    adminModal.addEventListener('click', (e) => {
-      if (e.target === adminModal) {
-        adminModal.style.display = 'none';
-      }
-    });
-  }
-});
-
-// Add keyboard shortcut for admin panel (Ctrl+Alt+A)
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.altKey && e.key === 'a') {
-    e.preventDefault();
-    document.getElementById('adminAccessBtn').click();
-  }
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Ctrl + Alt + A untuk admin panel
+    if (e.ctrlKey && e.altKey && e.key === 'a') {
+      e.preventDefault();
+      const adminIcon = document.getElementById('adminGearIcon');
+      if (adminIcon) adminIcon.click();
+    }
+    
+    // Escape untuk tutup modal
+    if (e.key === 'Escape') {
+      const modals = document.querySelectorAll('.admin-modal, .comment-modal');
+      modals.forEach(modal => {
+        if (modal.style.display === 'flex') {
+          modal.style.display = 'none';
+        }
+      });
+    }
+  });
 });
