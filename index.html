@@ -2323,6 +2323,167 @@
 <div class="comment-carousel" id="commentCarousel">
   <!-- Komentar akan dimuat dinamis di sini -->
 </div>
+
+    <!-- ========== MODAL FORM KOMENTAR ========== -->
+<div id="commentModal" class="comment-modal">
+  <div class="comment-modal-content">
+    <div class="comment-modal-header">
+      <h3><i class="ri-chat-3-line"></i> Tambah Komentar Anda</h3>
+      <button class="close-comment-modal" id="closeCommentModal">&times;</button>
+    </div>
+    
+    <form id="visitorCommentForm">
+      <div class="form-group">
+        <label for="commentName">Nama Lengkap *</label>
+        <input type="text" id="commentName" placeholder="Masukkan nama Anda" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="commentTitle">Judul Komentar *</label>
+        <input type="text" id="commentTitle" placeholder="Contoh: Pengalaman Seru di Rompok Cileunca" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="commentText">Isi Komentar *</label>
+        <textarea id="commentText" placeholder="Bagikan pengalaman liburan Anda di Rompok Cileunca..." rows="5" required></textarea>
+      </div>
+      
+      <button type="submit" class="comment-submit-btn">
+        <i class="ri-send-plane-fill"></i> Kirim Komentar
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+/* Style untuk modal komentar */
+.comment-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.comment-modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.comment-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.comment-modal-header h3 {
+  color: var(--dark-blue-color);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.close-comment-modal {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.close-comment-modal:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark-blue-color);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-family: var(--body-font);
+  font-size: 15px;
+  transition: border 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--blue-color);
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.comment-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--orange-color), var(--dark-orange-color));
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s;
+}
+
+.comment-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255,90,95,0.3);
+}
+</style>
     
     <!-- Right Side -->
     <div class="testimonial__right">
@@ -2581,6 +2742,7 @@
 </body>
 
 </html>
+
 
 
 
