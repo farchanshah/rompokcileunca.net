@@ -2009,70 +2009,152 @@
   // Main video events
   mainVideo.addEventListener('waiting', () => showSpinner(true));
   mainVideo.addEventListener('canplay', () => showSpinner(false));
-  mainVideo.addEventListener('playing', () => { showSpinner(false); mainPlay.style.display = 'none'; });
+  mainVideo.addEventListener('playing', () => { 
+    showSpinner(false); 
+    mainPlay.style.display = 'none'; 
+  });
   mainVideo.addEventListener('pause', () => { mainPlay.style.display = 'flex'; });
 
   // Overlay click -> play
   mainPlay.addEventListener('click', async () => {
-    try { await mainVideo.play(); } catch(e){}
+    try { 
+      await mainVideo.play(); 
+    } catch(e) {
+      console.error('Gagal memutar video:', e);
+    }
   });
 
   // Buttons
-  btnPlay.addEventListener('click', async ()=>{ try { await mainVideo.play(); } catch(e){} });
-  btnPause.addEventListener('click', ()=> mainVideo.pause());
-  btnStop.addEventListener('click', ()=> { mainVideo.pause(); mainVideo.currentTime = 0; mainPlay.style.display = 'flex'; });
-  btnFullscreen.addEventListener('click', ()=> {
-    const el = mainVideoFrame;
-    if (document.fullscreenElement) { document.exitFullscreen(); }
-    else { el.requestFullscreen?.() || el.webkitRequestFullscreen?.(); }
+  btnPlay.addEventListener('click', async () => { 
+    try { 
+      await mainVideo.play(); 
+    } catch(e) {} 
   });
-  volumeControl.addEventListener('input', ()=> { mainVideo.volume = parseFloat(volumeControl.value); });
+  btnPause.addEventListener('click', () => mainVideo.pause());
+  btnStop.addEventListener('click', () => { 
+    mainVideo.pause(); 
+    mainVideo.currentTime = 0; 
+    mainPlay.style.display = 'flex'; 
+  });
+  btnFullscreen.addEventListener('click', () => {
+    const el = mainVideoFrame;
+    if (document.fullscreenElement) { 
+      document.exitFullscreen(); 
+    } else { 
+      el.requestFullscreen?.() || el.webkitRequestFullscreen?.(); 
+    }
+  });
+  volumeControl.addEventListener('input', () => { 
+    mainVideo.volume = parseFloat(volumeControl.value); 
+  });
 
   // Init default volume
   mainVideo.volume = parseFloat(volumeControl.value || 0.8);
 
-  // Swap main video with clicked thumbnail
-  function swapWithThumb(thumbEl){
-    const newSrc = thumbEl.dataset.src;
-    if(!newSrc) return;
-
-    // Get current main src
-    const mainSrc = (mainVideo.querySelector('source')?.getAttribute('src')) || mainVideo.currentSrc;
-
-    // 1) set main to newSrc
-    const mainSource = mainVideo.querySelector('source');
-    if(mainSource){ mainSource.setAttribute('src', newSrc); }
-    else{
-      const s = document.createElement('source'); s.src = newSrc; s.type = 'video/mp4'; mainVideo.appendChild(s);
-    }
-    mainVideo.load();
-    mainVideo.play().catch(()=>{});
-
-    // 2) put old mainSrc into thumb preview (swap)
-    const thumbVideo = thumbEl.querySelector('.thumb__video');
+  // ====== VIDEO EXCHANGE SYSTEM (FIXED) ======
+  function exchangeVideo(clickedThumb) {
+    // Dapatkan elemen video dari thumbnail yang diklik
+    const thumbVideo = clickedThumb.querySelector('video');
     const thumbSource = thumbVideo.querySelector('source');
-    if(thumbSource){ thumbSource.setAttribute('src', mainSrc); }
-    else{
-      const ts = document.createElement('source'); ts.src = mainSrc; ts.type = 'video/mp4'; thumbVideo.appendChild(ts);
-    }
+    
+    // Dapatkan elemen video utama
+    const mainSource = mainVideo.querySelector('source');
+    
+    // Simpan URL video saat ini
+    const currentMainSrc = mainSource.src;
+    const currentThumbSrc = thumbSource.src;
+    
+    console.log('Menukar video:');
+    console.log('Main sebelumnya:', currentMainSrc);
+    console.log('Thumb sebelumnya:', currentThumbSrc);
+    
+    // Tukar sumber video
+    mainSource.src = currentThumbSrc;
+    thumbSource.src = currentMainSrc;
+    
+    // Muat ulang video
+    mainVideo.load();
     thumbVideo.load();
-
-    // Active state
-    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-    thumbEl.classList.add('active');
+    
+    // Update status aktif
+    document.querySelectorAll('.exchange-thumb').forEach(thumb => {
+      thumb.classList.remove('active');
+    });
+    clickedThumb.classList.add('active');
+    
+    // Coba putar video utama setelah ditukar
+    setTimeout(() => {
+      mainVideo.play().catch(e => {
+        console.log('Video utama otomatis diputar setelah pertukaran');
+      });
+    }, 500);
   }
 
-  // Click handlers for thumbnails (frame or overlay)
-  thumbsWrap.querySelectorAll('.thumb').forEach(thumb => {
-    thumb.addEventListener('click', ()=> swapWithThumb(thumb));
-    thumb.querySelector('.thumb__frame').addEventListener('click', ()=> swapWithThumb(thumb));
+  // Setup event listeners untuk thumbnail
+  function setupVideoExchange() {
+    const thumbs = document.querySelectorAll('.exchange-thumb');
+    
+    thumbs.forEach((thumb, index) => {
+      // Set thumbnail pertama sebagai aktif
+      if (index === 0) thumb.classList.add('active');
+      
+      // Setup event listener untuk pertukaran
+      thumb.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        exchangeVideo(thumb);
+      });
+      
+      // Setup video thumbnail untuk preload metadata
+      const thumbVideo = thumb.querySelector('video');
+      if (thumbVideo) {
+        thumbVideo.addEventListener('loadedmetadata', () => {
+          console.log(`Thumbnail ${index + 1} siap`);
+        });
+      }
+    });
+  }
+
+  // Panggil setup saat halaman dimuat
+  document.addEventListener('DOMContentLoaded', () => {
+    setupVideoExchange();
+    
+    // Setup video utama
+    mainVideo.addEventListener('loadedmetadata', () => {
+      console.log('Video utama siap');
+      // Set waktu awal untuk thumbnail
+      document.querySelectorAll('.exchange-thumb video').forEach(video => {
+        video.currentTime = 2; // Set ke detik ke-2 untuk preview
+      });
+    });
   });
 
   // Allow space/enter to toggle play
-  mainVideoFrame.addEventListener('keydown', (e)=>{
-    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); mainVideo.paused ? mainVideo.play() : mainVideo.pause(); }
+  mainVideoFrame.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ 
+      e.preventDefault(); 
+      mainVideo.paused ? mainVideo.play() : mainVideo.pause(); 
+    }
   });
   mainVideoFrame.setAttribute('tabindex','0');
+
+  // ====== CAROUSEL LOGIC (tetap sama) ======
+  const track = document.getElementById('carTrack');
+  const prevBtn = document.getElementById('carPrev');
+  const nextBtn = document.getElementById('carNext');
+  const dotsWrap = document.getElementById('carDots');
+  const toggleBtn = document.getElementById('carToggle');
+  const viewport = track.parentElement;
+
+  let perView = getPerView();
+  let autoplay = true;
+  let autoTimer = null;
+  let isDragging = false, startX = 0, scrollStart = 0;
+  let items = Array.from(track.children);
+
+  function getPerView(){
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rc-perView')) || 4;
+  }
 
   // ====== CAROUSEL LOGIC (4 per view / 2 / 1) ======
   const track = document.getElementById('carTrack');
@@ -2537,6 +2619,7 @@
 </body>
 
 </html>
+
 
 
 
