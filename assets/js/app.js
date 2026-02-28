@@ -979,5 +979,233 @@ $$
       // Update price calculator
       PriceCalculator.updatePrices({
         vip: { weekday: c.vipWeekday, weekend: c.vipWeekend },
-        cabin: { weekday: c.cabinWeekday, weekend: c.cabinWeekend }
+        cabin: { weekday: c.cabinWeekday, weekend: c.cabinWeekend }      });
+    },
+
+    loadCommentsAdmin() {
+      const container = safeGet('commentsList');
+      if (!container) return;
+
+      container.innerHTML = '';
+      const comments = CommentSystem.getComments();
+
+      if (comments.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#888;padding:20px">Belum ada komentar.</p>';
+        return;
+      }
+
+      comments.forEach(comment => {
+        const div = document.createElement('div');
+        div.className = 'admin-comment-item';
+        div.innerHTML = `
+          <div class="comment-header">
+            <strong>${CommentSystem.escapeHTML(comment.name)}</strong>
+            <span class="comment-date">${comment.date}</span>
+            <span class="comment-status ${comment.approved ? 'approved' : 'pending'}">
+              ${comment.approved ? '✓ Disetujui' : '⏳ Menunggu'}
+            </span>
+          </div>
+          <h4>${CommentSystem.escapeHTML(comment.title)}</h4>
+          <p>${CommentSystem.escapeHTML(comment.text)}</p>
+          <div class="comment-actions">
+            <button class="btn-approve" data-id="${comment.id}">
+              ${comment.approved ? 'Batalkan' : 'Setujui'}
+            </button>
+            <button class="btn-delete" data-id="${comment.id}">Hapus</button>
+          </div>`;
+        container.appendChild(div);
+      });
+
+      // Event listeners
+      
+$$
+('.btn-approve', container).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id);
+          CommentSystem.toggleApproval(id);
+          this.loadCommentsAdmin();
+        });
+      });
+$$
+('.btn-delete', container).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id);
+          if (confirm('Hapus komentar ini?')) {
+            CommentSystem.deleteComment(id);
+            this.loadCommentsAdmin();
+          }
+        });
+      });
+    },
+
+    backup() {
+      const data = {
+        cms: this.data,
+        comments: CommentSystem.getComments(),
+        exportDate: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rompok-cileunca-backup-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert('Backup berhasil diunduh!');
+    },
+
+    restore() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (data.cms) {
+              this.data = data.cms;
+              this.save();
+            }
+            if (data.comments) {
+              CommentSystem.comments = data.comments;
+              CommentSystem.save();
+              CommentSystem.updateCarousel();
+            }
+            this.applyContent();
+            this.populateFields();
+            this.loadCommentsAdmin();
+            alert('Data berhasil di-restore!');
+          } catch (err) {
+            alert('File backup tidak valid: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      });
+      input.click();
+    },
+
+    reset() {
+      if (!confirm('PERINGATAN: Semua data akan dikembalikan ke default. Lanjutkan?')) return;
+      if (!confirm('Anda yakin? Tindakan ini tidak bisa dibatalkan!')) return;
+
+      localStorage.removeItem(this.STORAGE_KEY);
+      localStorage.removeItem(CommentSystem.STORAGE_KEY);
+
+      this.data = this.getDefaults();
+      this.save();
+      this.applyContent();
+      this.populateFields();
+
+      CommentSystem.comments = CommentSystem.getDefaults();
+      CommentSystem.save();
+      CommentSystem.updateCarousel();
+      this.loadCommentsAdmin();
+
+      alert('Semua data telah direset ke default.');
+    }
+  };
+
+  // ===========================================
+  //  8. SCROLL REVEAL ANIMATIONS
+  // ===========================================
+  const Animations = {
+    init() {
+      if (typeof ScrollReveal === 'undefined') {
+        console.warn('ScrollReveal not loaded');
+        return;
+      }
+
+      const sr = ScrollReveal({
+        distance: '60px',
+        duration: 900,
+        easing: 'cubic-bezier(0.5, 0, 0, 1)',
+        reset: false,
+        mobile: true
+      });
+
+      // Home
+      sr.reveal('.home__image-girl', { origin: 'left', distance: '80px', delay: 300 });
+      sr.reveal('.home__title', { origin: 'left', delay: 500 });
+      sr.reveal('.home__subtitle-text', { origin: 'bottom', delay: 200 });
+      sr.reveal('.home__desc', { origin: 'bottom', delay: 400 });
+      sr.reveal('.hero__btn', { origin: 'bottom', delay: 600 });
+      sr.reveal('.home__image-plane', { origin: 'left', delay: 700 });
+      sr.reveal('.home__image-birds', { origin: 'top', delay: 800 });
+      sr.reveal('.home__image-map, .home__image-icon', { origin: 'right', delay: 400 });
+      sr.reveal('.booking__item', { origin: 'bottom', interval: 150, delay: 500 });
+      sr.reveal('.search__box', { origin: 'bottom', delay: 300 });
+
+      // About
+      sr.reveal('.about__content', { origin: 'left' });
+      sr.reveal('.about__images', { origin: 'right' });
+      sr.reveal('.about__one-container', { origin: 'bottom', delay: 300 });
+      sr.reveal('.about__features', { origin: 'bottom', delay: 400 });
+
+      // Memories
+      sr.reveal('.memories__intro', { origin: 'top' });
+      sr.reveal('.memories__images-box', { origin: 'left' });
+      sr.reveal('.memories__activities', { origin: 'right' });
+      sr.reveal('.memories__btn-group', { origin: 'bottom', delay: 300 });
+
+      // Features
+      sr.reveal('.features__left', { origin: 'left' });
+      sr.reveal('.features__card-wrapper', { origin: 'bottom', interval: 200 });
+
+      // Nature
+      sr.reveal('.nature__intro', { origin: 'top' });
+      sr.reveal('.nature__card', { origin: 'bottom', interval: 150 });
+
+      // Rooms
+      sr.reveal('.cabin__card', { origin: 'bottom', interval: 100 });
+
+      // Paket
+      sr.reveal('.paket-section__card', { origin: 'bottom', interval: 150 });
+
+      // Gallery
+      sr.reveal('.gallery__intro', { origin: 'top' });
+      sr.reveal('.video-section', { origin: 'bottom', delay: 200 });
+      sr.reveal('.carousel', { origin: 'bottom', delay: 300 });
+
+      // Testimonial
+      sr.reveal('.testimonial__left', { origin: 'left' });
+      sr.reveal('.testimonial__right', { origin: 'right' });
+
+      // Promo
+      sr.reveal('.promo__text', { origin: 'bottom' });
+
+      // Footer
+      sr.reveal('.footer__logo', { origin: 'left', delay: 200 });
+      sr.reveal('.social__icons', { origin: 'left', delay: 400 });
+      sr.reveal('.contact__info', { origin: 'left', delay: 600 });
+      sr.reveal('.footer__maps-box', { origin: 'right', delay: 400 });
+      sr.reveal('.footer__bottom', { origin: 'bottom', delay: 200 });
+
+      // Topic badges & headings
+      sr.reveal('.topic', { origin: 'top', interval: 100 });
+      sr.reveal('.heading', { origin: 'top', delay: 200 });
+      sr.reveal('.description', { origin: 'bottom', delay: 100 });
+      sr.reveal('.btn', { origin: 'bottom', delay: 200 });
+    }
+  };
+
+  // ===========================================
+  //  9. INITIALIZATION
+  // ===========================================
+  document.addEventListener('DOMContentLoaded', () => {
+    Navigation.init();
+    PriceCalculator.init();
+    VideoPlayer.init();
+    PhotoCarousel.init();
+    CommentSystem.init();
+    AdminCMS.init();
+    Animations.init();
+
+    console.log('✅ Rompok Cileunca — All Systems Initialized');
+  });
+
+})();
       
